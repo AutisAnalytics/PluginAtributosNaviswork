@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage SchemaVersion="1.0" Name="AutisAtributos" AppVersion="2.0.0" Description="Autis Analytics - Leitura e gravação de atributos customizados" Author="Autis Analytics" ProductCode="{a1b2c3d4-e5f6-7890-abcd-ef1234567890}">
+  <CompanyDetails Name="Autis Analytics" />
+  <Components Description="Navisworks 2026">
+    <RuntimeRequirements OS="Win64" Platform="NAVMAN|NAVSIM" SeriesMin="Nw23" SeriesMax="Nw23" />
+    <ComponentEntry AppName="AutisAnalytics.NavisworksAtributos" AppType="ManagedPlugin" Version="2.0.0" ModuleName="Contents\v23\AutisAnalytics.NavisworksAtributos.dll" AppDescription="Ribbon e ferramentas de atributos para Navisworks 2026" />
+  </Components>
+</ApplicationPackage>

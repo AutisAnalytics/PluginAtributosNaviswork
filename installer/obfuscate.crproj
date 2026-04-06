@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ConfuserEx — Configuração de Ofuscação
+  Autis Analytics - Navisworks Plugin
+
+  Protege o DLL contra:
+    - Descompilação (dnSpy, ILSpy, dotPeek)
+    - Extração da chave de licenciamento
+    - Engenharia reversa do algoritmo de ativação
+
+  Não ofusca os metadados do [Plugin] attribute (necessário para o Navisworks carregar o plugin).
+-->
+<project baseDir="staging\Contents\v23"
+         outputDir="staging\Contents\v23"
+         xmlns="http://confuser.codeplex.com">
+
+  <!--
+    Regra global: aplica ofuscação máxima em tudo
+    (O Navisworks usa o atributo [Plugin], não o nome da classe — pode renomear tudo)
+  -->
+  <rule pattern="true" preset="maximum" inherit="false">
+
+    <!-- Renomeia classes, métodos, campos para caracteres unicode ilegíveis -->
+    <protection id="rename">
+      <argument name="mode" value="unicode" />
+    </protection>
+
+    <!-- Embaralha fluxo de controle: if/else vira goto spaghetti -->
+    <protection id="ctrl flow">
+      <argument name="intensity" value="5" />
+    </protection>
+
+    <!-- Criptografa todas as strings literais (chaves HMAC, emails, URLs) -->
+    <protection id="encrypt strings">
+      <argument name="mode" value="dynamic" />
+    </protection>
+
+    <!-- Ofusca referências a métodos externos -->
+    <protection id="ref proxy">
+      <argument name="mode" value="strong" />
+    </protection>
+
+    <!-- Anti-debug: detecta e encerra se rodando em depurador -->
+    <protection id="anti debug">
+      <argument name="mode" value="safe" />
+    </protection>
+
+    <!-- Anti-dump: impede extração do DLL da memória -->
+    <protection id="anti dump" />
+
+    <!-- Marca d'água invisível com versão/autor no binário -->
+    <protection id="watermark" />
+
+  </rule>
+
+  <!-- DLL a ofuscar (gerado pelo build Release) -->
+  <module path="AutisAnalytics.NavisworksAtributos.dll" />
+
+</project>

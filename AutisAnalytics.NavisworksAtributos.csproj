@@ -1,0 +1,99 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>AutisAnalytics.NavisworksAtributos</AssemblyName>
+    <RootNamespace>AutisAnalytics.NavisworksAtributos</RootNamespace>
+    <OutputType>Library</OutputType>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <UseWindowsForms>true</UseWindowsForms>
+    <NoWarn>CS8600;CS8602;CS8603</NoWarn>
+
+    <!-- Saída direto para o .bundle em ApplicationPlugins -->
+    <OutputPath>$(AppData)\Autodesk\ApplicationPlugins\AutisAtributos.bundle\Contents\v23\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NavisworksDir Condition="'$(NavisworksDir)'==''">C:\Program Files\Autodesk\Navisworks Manage 2026</NavisworksDir>
+    <CopyReleaseToBundle Condition="'$(CopyReleaseToBundle)'==''">true</CopyReleaseToBundle>
+  </PropertyGroup>
+
+  <!-- Release: saída para pasta staging do instalador -->
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <OutputPath>$(MSBuildProjectDirectory)\installer\staging\Contents\v23\</OutputPath>
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <DefineConstants>RELEASE</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Release: copia para o bundle local apenas quando solicitado explicitamente -->
+  <Target Name="CopiarParaBundle" AfterTargets="Build"
+          Condition="'$(Configuration)'=='Release' and '$(CopyReleaseToBundle)'=='true'">
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
+          DestinationFolder="$(AppData)\Autodesk\ApplicationPlugins\AutisAtributos.bundle\Contents\v23\"
+          OverwriteReadOnlyFiles="true"
+          SkipUnchangedFiles="true"
+          ContinueOnError="WarnAndContinue" />
+    <Message Text="✓ DLL copiada para AutisAtributos.bundle" Importance="high" />
+  </Target>
+
+  <!-- Debug: saída direto para o bundle local (desenvolvimento) -->
+  <PropertyGroup Condition="'$(Configuration)'!='Release'">
+    <OutputPath>$(AppData)\Autodesk\ApplicationPlugins\AutisAtributos.bundle\Contents\v23\</OutputPath>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- APIs gerenciadas do Navisworks -->
+    <Reference Include="Autodesk.Navisworks.Api">
+      <HintPath>$(NavisworksDir)\Autodesk.Navisworks.Api.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- COM Interop - necessário para ESCRITA de propriedades customizadas -->
+    <Reference Include="Autodesk.Navisworks.Interop.ComApi">
+      <HintPath>$(NavisworksDir)\Autodesk.Navisworks.Interop.ComApi.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Bridge Managed → COM (NW 2026) -->
+    <Reference Include="Autodesk.Navisworks.ComApi">
+      <HintPath>$(NavisworksDir)\Autodesk.Navisworks.ComApi.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- AdWindows - API da Ribbon WPF (criação programática de abas) -->
+    <Reference Include="AdWindows">
+      <HintPath>$(NavisworksDir)\AdWindows.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- WPF - necessário para tipos como ImageSource -->
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+
+    <!-- CSharp runtime binder (para dynamic/late-binding COM) -->
+    <Reference Include="Microsoft.CSharp" />
+
+    <!-- WinForms -->
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+
+    <!-- HTTP + JSON para APS/ACC Connector -->
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web.Extensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

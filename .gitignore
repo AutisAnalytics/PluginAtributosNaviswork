@@ -1,0 +1,15 @@
+.vs/
+obj/
+bin/
+
+.claude/
+.vscode/
+
+installer/output/
+installer/staging/Contents/v23/
+installer/staging/ia_config.txt
+
+*.user
+*.suo
+*.pdb
+*.rar
