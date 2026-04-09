@@ -138,6 +138,21 @@ namespace AutisAnalytics.NavisworksAtributos
             btnColorizer.CommandHandler = new AutisCommandHandler();
             panelVisSource.Items.Add(btnColorizer);
 
+            // Botão Merge NWD
+            var btnMerge = new RibbonButton
+            {
+                Text        = "Merge\nNWD",
+                Id          = "ID_BTN_MERGE",
+                Size        = RibbonItemSize.Large,
+                ShowText    = true,
+                ShowImage   = true,
+                Orientation = System.Windows.Controls.Orientation.Vertical,
+                LargeImage  = CriarIcone("M", System.Drawing.Color.FromArgb(255, 152, 0)),
+                Image       = CriarIcone16("M", System.Drawing.Color.FromArgb(255, 152, 0))
+            };
+            btnMerge.CommandHandler = new AutisCommandHandler();
+            panelVisSource.Items.Add(btnMerge);
+
             var panelVis = new RibbonPanel { Source = panelVisSource };
             tab.Panels.Add(panelVis);
 
@@ -244,6 +259,9 @@ namespace AutisAnalytics.NavisworksAtributos
                 case "ID_BTN_INSPECTOR":
                     ExecutarInspector();
                     break;
+                case "ID_BTN_MERGE":
+                    ExecutarMerge();
+                    break;
             }
         }
 
@@ -314,6 +332,34 @@ namespace AutisAnalytics.NavisworksAtributos
             using (var form = new ColorizerForm())
             {
                 form.ShowDialog();
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        // Merge NWD
+        // ─────────────────────────────────────────────────────────────────
+
+        private void ExecutarMerge()
+        {
+            var doc = Autodesk.Navisworks.Api.Application.ActiveDocument;
+            if (doc == null || doc.IsClear)
+            {
+                MessageBox.Show("No document open.",
+                    "AWP Autis", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using (var ofd = new OpenFileDialog())
+            {
+                ofd.Title = "Select the NEW revised NWD";
+                ofd.Filter = "NWD Files (*.nwd)|*.nwd|All Files (*.*)|*.*";
+
+                if (ofd.ShowDialog() != DialogResult.OK) return;
+
+                using (var form = new MergeForm(ofd.FileName))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 

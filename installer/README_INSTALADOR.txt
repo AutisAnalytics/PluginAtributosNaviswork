@@ -18,13 +18,13 @@ OPCAO 1 - Build padrao:
 
 OPCAO 2 - Definindo a versao do instalador:
   Execute:
-    build_installer.bat /versao:1.2.0
+    build_installer.bat /versao:2.0.0
 
 OPCAO 3 - Compilar manualmente via InnoSetup:
   1. Compile o projeto no Visual Studio em Release x64
   2. Garanta que o PackageContents.xml em installer\staging\ esteja correto
   3. Execute:
-       "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion=1.2.0 installer\AutisAtributos.iss
+       "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion=2.0.0 installer\AutisAtributos.iss
 
 O instalador gerado estara em:
   installer\output\AutisAtributos_v<versao>_Setup.exe

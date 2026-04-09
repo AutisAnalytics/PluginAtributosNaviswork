@@ -7,6 +7,7 @@ Plugin para Autodesk Navisworks 2026 focado em:
 - seleção e gravação de nomes de `Sets`
 - inspeção tabular da seleção
 - colorização por modelo e por `Selection/Search Set`
+- comparação entre revisões `NWD` com transferência de dados Autis
 
 O projeto é escrito em `C#`, roda em `.NET Framework 4.8` e usa:
 
@@ -17,12 +18,13 @@ O projeto é escrito em `C#`, roda em `.NET Framework 4.8` e usa:
 
 ## Visão geral
 
-Quando o Navisworks carrega o plugin, ele cria a aba `AWP Autis` na ribbon. A partir dela, o usuário acessa 4 fluxos principais:
+Quando o Navisworks carrega o plugin, ele cria a aba `AWP Autis` na ribbon. A partir dela, o usuário acessa 5 fluxos principais:
 
 1. `Read Properties`
 2. `Write Properties`
 3. `Selection Inspector`
 4. `Colorizer`
+5. `Merge NWD`
 
 O coração do projeto é:
 
@@ -65,6 +67,18 @@ O coração do projeto é:
 
 - `ColorizerForm.cs`
   Tela para colorir por modelos ou por sets.
+
+- `MergeForm.cs`
+  Tela de análise e execução do merge entre revisões `NWD`.
+
+- `MergeService.cs`
+  Serviço de extração de fingerprint, comparação entre elementos e execução da transferência.
+
+- `MergeModels.cs`
+  Modelos de dados usados no relatório de merge.
+
+- `MERGE_SPEC.md`
+  Especificação funcional e técnica do fluxo de `Merge NWD`.
 
 ### UI compartilhada
 
@@ -203,6 +217,38 @@ Arquivo:
 
 - `ColorizerForm.cs`
 
+### 7. Merge NWD
+
+Fluxo:
+
+1. O usuário abre `Merge NWD`.
+2. Seleciona um novo arquivo `NWD` revisado.
+3. O plugin extrai fingerprints do modelo atual e do revisado.
+4. O comparador executa três níveis principais:
+   - `Level 1`: IDs únicos
+   - `Level 2`: chave composta
+   - `Level 3`: score ponderado por nome, tipo/categoria, geometria e hierarquia
+5. A tela mostra:
+   - pareados
+   - novos
+   - removidos
+   - candidatos
+6. O usuário pode aceitar candidatos e executar a transferência de atributos/set.
+
+Melhorias recentes no comparador:
+
+- `Level 1` e `Level 2` agora só fazem auto-match quando a chave é única nos dois lados
+- candidatos não são mais classificados também como `New`
+- o reset visual do merge limpa só as cores aplicadas pelo próprio merge
+- fechar a tela sem executar o merge remove o modelo revisado anexado temporariamente
+
+Arquivos:
+
+- `MergeForm.cs`
+- `MergeService.cs`
+- `MergeModels.cs`
+- `MERGE_SPEC.md`
+
 ## Persistência dos dados
 
 ### Schema atual
@@ -264,6 +310,25 @@ Observação importante:
 - nesse caso o build compila, mas a cópia para o bundle pode falhar ou gerar aviso
 - para testar a última versão no plugin carregado, feche o Navisworks antes do build
 
+### Deploy da DLL
+
+Passo a passo recomendado:
+
+1. Feche o Navisworks.
+2. Rode:
+
+```powershell
+dotnet build AutisAnalytics.NavisworksAtributos.csproj -c Release -p:PlatformTarget=x64 --nologo
+```
+
+3. Confirme que a DLL foi atualizada em:
+
+```text
+%AppData%\Autodesk\ApplicationPlugins\AutisAtributos.bundle\Contents\v23\
+```
+
+4. Abra o Navisworks e teste a nova versão.
+
 ## Passo a passo para testar
 
 ### Teste de leitura
@@ -299,6 +364,17 @@ Observação importante:
 4. Confirme a exclusão.
 5. Verifique se a categoria foi removida.
 
+### Teste de merge NWD
+
+1. Abra o modelo base no Navisworks.
+2. Clique em `Merge NWD`.
+3. Escolha o arquivo `NWD` revisado.
+4. Aguarde a análise.
+5. Revise os grupos `Matched`, `New`, `Removed` e `Candidates`.
+6. Se necessário, aceite manualmente candidatos válidos.
+7. Clique em `Execute Merge`.
+8. Verifique no modelo revisado se os dados de `Autis_Attributes` foram transferidos.
+
 ## Passo a passo para gerar o instalador
 
 ### Opção 1: script automático
@@ -328,6 +404,36 @@ build_installer.bat /versao:2.0.0
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion=2.0.0 installer\AutisAtributos.iss
 ```
 
+### Arquivo gerado
+
+Saída esperada:
+
+```text
+installer\output\AutisAtributos_v2.0.0_Setup.exe
+```
+
+## Passo a passo de release
+
+Fluxo recomendado para fechar uma versão:
+
+1. Feche o Navisworks.
+2. Rode o build `Release`.
+3. Teste no Navisworks:
+   - `Read Properties`
+   - `Write Properties`
+   - `Selection Inspector`
+   - `Colorizer`
+   - `Merge NWD`
+4. Gere o instalador:
+
+```bat
+build_installer.bat /versao:2.0.0
+```
+
+5. Confirme o `.exe` em `installer\output`.
+6. Atualize a documentação necessária.
+7. Publique no GitHub.
+
 ## Publicação e GitHub
 
 O repositório foi preparado para publicação pública com `.gitignore` para não subir:
@@ -347,6 +453,21 @@ Isso evita publicar:
 - instaladores gerados
 - configurações locais
 - arquivos sensíveis
+
+### Passo a passo para publicar
+
+1. Garanta que `README.md`, `installer/README_INSTALADOR.txt` e os arquivos do plugin estejam atualizados.
+2. Gere e teste a versão localmente.
+3. Faça commit do código-fonte.
+4. Envie para o repositório público:
+
+```text
+https://github.com/AutisAnalytics/PluginAtributosNaviswork
+```
+
+Observação:
+
+- o instalador `.exe` é mantido como artefato local e não sobe por padrão por causa do `.gitignore`
 
 ## Onde mexer quando quiser alterar algo
 

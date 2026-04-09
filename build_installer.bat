@@ -17,7 +17,7 @@ set "PROJECT_DIR=%~dp0"
 set "ISS_FILE=%PROJECT_DIR%installer\AutisAtributos.iss"
 set "STAGING_DIR=%PROJECT_DIR%installer\staging"
 set "OUTPUT_DIR=%PROJECT_DIR%installer\output"
-set "APP_VERSION=1.0.0"
+set "APP_VERSION=2.0.0"
 
 :: Processa argumentos
 for %%A in (%*) do (

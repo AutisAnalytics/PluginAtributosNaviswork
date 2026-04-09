@@ -8,7 +8,7 @@
 ; =============================================================================
 
 #ifndef AppVersion
-  #define AppVersion "1.0.0"
+  #define AppVersion "2.0.0"
 #endif
 
 #define AppName      "Autis Analytics - Navisworks Plugin"
